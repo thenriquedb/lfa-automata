@@ -14,7 +14,4 @@ def map_transitions(state: dict):
         "from": state.get("from"),
         "to": state.get("to"),
         "read": state.get("read"),
-        # "id": state.get("@id"),
-        # "x": state.get("x"),
-        # "y": state.get("y"),
     }

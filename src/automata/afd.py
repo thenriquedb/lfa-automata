@@ -1,50 +1,105 @@
+from automata import Automata
 
-class AFD:
-    def __init__(self, alfabeto) -> None:
-        self.states = list()
+
+class AFD(Automata):
+    def __init__(self, alfabeto):
+        self.states = set()
         self.alfabeto = alfabeto
         self.transitions = dict()
         self.initial = None
-        self.finals = list()
-        self.hasError = False
+        self.finals = set()
 
-    def _stateIsValid(self, state):
+    def clear_afd(self):
+        """Inicializa as variaveis utilizadas no processamento de cadeias"""
+        self.__hasError = False
+        self.__current_state = self.initial
+
+    @property
+    def has_error(self):
+        return self.__has_error
+
+    @property
+    def current_state(self):
+        return self.__current_state
+
+    def __state_is_valid(self, state):
         if state in self.states:
             return True
         return False
 
-    def _symbolIsValid(self, symbol):
-        if symbol in self.alfabeto:
+    def __symbol_is_valid(self, symbol):
+        if len(symbol) != 1 or symbol in self.alfabeto:
             return True
         return False
 
-    def clear(self):
-        print('clear afd')
-
-    def createState(self, name):
-        if not None in self.states:
-            self.states.append(name)
-
-    def createTransition(self, origin, destiny, symbol):
-        if not self._stateIsValid(origin):
-            return False
-        if not self._stateIsValid(destiny):
-            return False
-        if not self._symbolIsValid(symbol):
+    def create_state(self, id: int, initial=False, final=False):
+        if id in self.states:
             return False
 
-        self.transitions[(origin, destiny)] = destiny
+        self.states = self.states.union({id})
 
-    def configState(self, state, initial=False, final=False):
-        if not self._stateIsValid(state):
+        if initial:
+            self.initial = id
+        if final:
+            self.finals = self.finals.union({id})
+
+        return True
+
+    def create_transition(self, origin: int, destiny: int, symbol: str):
+        if not self.__state_is_valid(origin):
+            return False
+        if not self.__state_is_valid(destiny):
+            return False
+        if not self.__symbol_is_valid(symbol):
+            return False
+
+        self.transitions[(origin, symbol)] = destiny
+
+    def change_initial_state(self, id: int):
+        """Define um estado já existente como inicial"""
+        if not self.__state_is_valid(id):
+            return
+
+        self.initial = id
+
+    def change_final_state(self, id: int, final: bool):
+        """Define um estado já existente como final"""
+        if not self.__state_is_valid(id):
+            return
+        if final:
+            self.finals = self.finals.union({id})
+        else:
+            self.finals = self.finals.difference({id})
+
+    def config_state(self, state, initial=False, final=False):
+        if not self.__state_is_valid(state):
             return
 
         if initial:
             self.initial = state
         if final:
-            self.finals.append(state)
-        elif self._stateIsValid(state) and state in self.finals:
+            self.finals.add(state)
+        elif self.__state_is_valid(state) and state in self.finals:
             self.finals.remove(state)
+
+    def move(self, string: str):
+        """
+        Partindo do estado atual, processa a cadeia e retorna o estado de parada. 
+        Se ocorrer error, defina a variável __has_error como True
+        """
+        for symbol in string:
+            if not self.__symbol_is_valid(symbol):
+                self.__hasError = True
+                break
+
+            if(self.__current_state, symbol) in self.transitions.keys():
+                new_state = self.transitions[(self.__current_state, symbol)]
+                self.__current_state = new_state
+            else:
+                self.__hasError = True
+                break
+
+            return self.__current_state
 
     def check(self, string):
         state = self.initial
@@ -58,30 +113,29 @@ class AFD:
         return state in self.finals
 
     def __str__(self):
-        return 'print'
+        string = 'AFD(E, A, T,i, F): \n'
 
+        string += '  S = { '
+        for state in self.states:
+            string += '{}, '.format(str(state))
+        string += '} \n'
 
-if __name__ == '__main__':
-    afd = AFD(['a', 'b'])
+        string += '  A = { '
+        for symbol in self.alfabeto:
+            string += '{}, '.format(str(symbol))
+        string += '} \n'
 
-    for i in range(1, 5):
-        afd.createState(i)
+        string += '  T = { '
+        for (state, symbol) in self.transitions.keys():
+            destiny = self.transitions[(state, symbol)]
+            string += '({},{}) --> {} '.format(state, symbol, destiny)
+        string += '} \n'
 
-    afd.configState(1, initial=True)
-    afd.configState(4)
+        string += '  I = {} \n'.format(self.initial)
 
-    afd.createTransition(1, 2, 'a')
-    afd.createTransition(2, 1, 'a')
-    afd.createTransition(3, 4, 'a')
-    afd.createTransition(4, 3, 'a')
-    afd.createTransition(1, 3, 'b')
-    afd.createTransition(3, 1, 'b')
-    afd.createTransition(4, 4, 'b')
-    afd.createTransition(4, 2, 'b')
+        string += '  F = { '
+        for state in self.finals:
+            string += '{}'.format(str(state))
+        string += ' } \n'
 
-    print(afd)
-
-    string = 'abbaab'
-    afd.clear()
-    # print(afd.check('aa'))
-    # afd.createTransition('SN', 'sn', 1)
+        return string
