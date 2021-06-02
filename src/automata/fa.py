@@ -2,19 +2,22 @@ from abc import ABC, abstractmethod
 
 
 class FA():
-    def __init__(self, alfabeto):
-        self.alfabeto = alfabeto
+    def __init__(self, alphabet):
+        self.alphabet = alphabet
         self.states = set()
         self.transitions = dict()
         self.valid_transitions = dict()
         self.initial = None
+        self.current_state = None
         self.finals = set()
+        self.__has_error = False
 
     def clear_afd(self):
         """Inicializa as variaveis utilizadas no processamento de cadeias"""
-        self.__hasError = False
+        self.__has_error = False
         self.__current_state = self.initial
 
+    @property
     def has_error(self):
         return self.__has_error
 
@@ -27,7 +30,7 @@ class FA():
         return False
 
     def _symbol_is_valid(self, symbol):
-        if len(symbol) != 1 or symbol in self.alfabeto:
+        if len(symbol) != 1 or symbol in self.alphabet:
             return True
         return False
 
@@ -103,7 +106,7 @@ class FA():
         string += '} \n'
 
         string += '  A = { '
-        for symbol in self.alfabeto:
+        for symbol in self.alphabet:
             string += '{}, '.format(str(symbol))
         string += '} \n'
 

@@ -17,30 +17,25 @@ if __name__ == '__main__':
     # afd.read_jff('../static/comecam-aa-ou-bb.xml')
 
     afd = DFA(['a', 'b'])
-    for i in range(1, 6):
-        afd.create_state(i)
 
-    afd.config_state(1, initial=True)
-    afd.config_state(4, final=True)
-    afd.config_state(3, final=True)
+    afd.create_state('q0', initial=True)
+    afd.create_state('q1', final=True)
+    afd.create_state('q2', final=True)
 
-    # afd.create_transition(1, 2, 'a')
-    # afd.create_transition(2, 1, 'a')
-    # afd.create_transition(3, 4, 'a')
-    # afd.create_transition(4, 3, 'a')
-    # afd.create_transition(1, 3, 'b')
-    # afd.create_transition(3, 1, 'b')
-    # afd.create_transition(4, 4, 'b')
-    # afd.create_transition(4, 2, 'b')
+    afd.create_transition('q0', 'q1', 'a')
+    afd.create_transition('q0', 'q2', 'b')
 
-    afd.create_transition(1, 2, 'a')
-    afd.create_transition(1, 1, 'a')
-    afd.create_transition(1, 3, 'a')
-    afd.create_transition(2, 1, 'a')
-    afd.create_transition(4, 5, 'a')
-    afd.minify()
+    afd.create_transition('q1', 'q0', 'b')
+    afd.create_transition('q1', 'q1', 'a')
+
+    afd.create_transition('q2', 'q0', 'a')
+    afd.create_transition('q2', 'q2', 'b')
+
+    # afd.minify()
     print(afd)
 
-    string = 'abbaab'
+    string = 'aababbabb'
+    print('Cadeia valida') if afd.check(string) else print('Cadeia invalida')
+
     # print(afd.check('aa'))
     # afd.create_transition('SN', 'sn', 1)

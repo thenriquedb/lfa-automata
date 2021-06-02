@@ -59,25 +59,6 @@ class DFA(FA):
 
         return True
 
-    def move(self, string: str):
-        """
-        Partindo do estado atual, processa a cadeia e retorna o estado de parada.
-        Se ocorrer error, defina a variável __has_error como True
-        """
-        for symbol in string:
-            if not self._symbol_is_valid(symbol):
-                self.__hasError = True
-                break
-
-            if(self.__current_state, symbol) in self.transitions.keys():
-                new_state = self.transitions[(self.__current_state, symbol)]
-                self.__current_state = new_state
-            else:
-                self.__hasError = True
-                break
-
-            return self.__current_state
-
     def __remove_unreachable_states(self):
         """
         Remove os estados inalcançaveis e suas transições
@@ -102,7 +83,7 @@ class DFA(FA):
         Retorna todos os estados alcançaveis através do estado inicial.
 
         Returns:
-            Um conjunto com os estados que são aalcançaveis através do estado inicial 
+            Um conjunto com os estados que são aalcançaveis através do estado inicial
         """
         reachable_states = set()
         states_to_check = []
@@ -124,6 +105,28 @@ class DFA(FA):
                     states_to_check.append(state[0])
 
             return reachable_states
+
+    def check(self, string: str):
+        """
+        Partindo do estado atual, processa a cadeia e retorna o estado de parada.
+        Se ocorrer error, defina a variável __has_error como True
+        """
+        self.current_state = self.initial
+        for symbol in string:
+            if not self._symbol_is_valid(symbol):
+                self.__has_error = True
+                return False
+                break
+
+            if(self.current_state, symbol) in self.transitions.keys():
+                new_state = self.transitions[(self.current_state, symbol)]
+                self.current_state = new_state
+            else:
+                self.__has_error = True
+                return False
+                break
+
+        return self.current_state in self.finals
 
     def minify(self):
         self.__remove_unreachable_states()
