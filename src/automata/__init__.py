@@ -1,2 +1,2 @@
 from .automata import Automata
-from .afd import AFD
+from .dfa import DFA
