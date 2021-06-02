@@ -1,5 +1,4 @@
 from .fa import FA
-from typing import Mapping
 
 
 class DFA(FA):
@@ -16,13 +15,13 @@ class DFA(FA):
             destiny (str): Estado de destino
 
         Returns:
-            Cada estado é representado com uma lista de tupla, 
-            onde o primeiro valor é o estado que alcança e o segundo é o simbolo. 
+            Cada estado é representado com uma lista de tupla,
+            onde o primeiro valor é o estado que alcança e o segundo é o simbolo.
             Por exemplo:
             {
                 1: [(2, 'a'), (2, 'a')],
                 2: [(1, 'a')],
-                5: [(5, 'a')] 
+                5: [(5, 'a')]
             }
         """
         valid_transitions = self.valid_transitions
@@ -79,15 +78,26 @@ class DFA(FA):
 
             return self.__current_state
 
-    def _remove_unreachable_states(self):
+    def __remove_unreachable_states(self):
         """
         Remove os estados inalcançaveis e suas transições
         """
+        reachable_states = self.__get_reachable_states()
 
-        reachable_states = self._get_reachable_states()
-        print('reachable_states ', reachable_states)
+        # Remove transições desnecessárias
+        new_transitions = dict()
+        for (state, transitions) in self.valid_transitions.items():
+            if state in reachable_states:
+                new_transitions[state] = transitions
 
-    def _get_reachable_states(self):
+        # Remove estados inalcançaveis
+        states = self.states
+        new_states = filter(lambda state: state in reachable_states, states)
+
+        self.states = list(new_states)
+        self.valid_transitions = new_transitions
+
+    def __get_reachable_states(self):
         """
         Retorna todos os estados alcançaveis através do estado inicial.
 
@@ -114,3 +124,6 @@ class DFA(FA):
                     states_to_check.append(state[0])
 
             return reachable_states
+
+    def minify(self):
+        self.__remove_unreachable_states()

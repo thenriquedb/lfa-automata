@@ -34,10 +34,11 @@ if __name__ == '__main__':
     # afd.create_transition(4, 2, 'b')
 
     afd.create_transition(1, 2, 'a')
+    afd.create_transition(1, 1, 'a')
     afd.create_transition(1, 3, 'a')
     afd.create_transition(2, 1, 'a')
     afd.create_transition(4, 5, 'a')
-    afd._remove_unreachable_states()
+    afd.minify()
     print(afd)
 
     string = 'abbaab'
