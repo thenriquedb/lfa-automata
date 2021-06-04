@@ -10,16 +10,10 @@ class FA():
         self.initial = None
         self.current_state = None
         self.finals = set()
-        self.__has_error = False
 
     def clear_afd(self):
         """Inicializa as variaveis utilizadas no processamento de cadeias"""
-        self.__has_error = False
         self.__current_state = self.initial
-
-    @property
-    def has_error(self):
-        return self.__has_error
 
     def current_state(self):
         return self.__current_state
