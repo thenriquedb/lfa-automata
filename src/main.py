@@ -24,14 +24,12 @@ if __name__ == '__main__':
 
     afd.create_transition('q0', 'q1', 'a')
     afd.create_transition('q0', 'q2', 'b')
-
     afd.create_transition('q1', 'q0', 'b')
     afd.create_transition('q1', 'q1', 'a')
-
     afd.create_transition('q2', 'q0', 'a')
     afd.create_transition('q2', 'q2', 'b')
 
-    # afd.minify()
+    afd.minify()
     print(afd)
 
     string = 'aababbabb'

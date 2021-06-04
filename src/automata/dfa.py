@@ -1,3 +1,5 @@
+from __future__ import annotations
+import copy
 from .fa import FA
 
 
@@ -109,24 +111,59 @@ class DFA(FA):
     def check(self, string: str):
         """
         Partindo do estado atual, processa a cadeia e retorna o estado de parada.
-        Se ocorrer error, defina a variável __has_error como True
+
+        Returns:
+            bool: True se a string passada for valída ou False  contrário
         """
+
         self.current_state = self.initial
         for symbol in string:
             if not self._symbol_is_valid(symbol):
-                self.__has_error = True
                 return False
-                break
 
             if(self.current_state, symbol) in self.transitions.keys():
                 new_state = self.transitions[(self.current_state, symbol)]
                 self.current_state = new_state
             else:
-                self.__has_error = True
                 return False
-                break
 
         return self.current_state in self.finals
 
+    def __equivalent_states(self, dfa: DFA):
+
+        # Iniciando tabela de comparação
+        distinct_states = dict()
+        all_transitions = dfa.valid_transitions.items()
+        for (state, _) in all_transitions:
+            distinct_states[state] = set()
+
+        # Estados finais não são equivalentes
+        for checking_state in dfa.states:
+            transitions_tuples = dfa.valid_transitions.get(checking_state)
+
+            if not transitions_tuples:
+                continue
+
+            temp = dict()
+            for (state, _) in transitions_tuples:
+                if state in dfa.finals:
+                    # print('ok')
+                    temp[checking_state] = False
+                    continue
+            distinct_states[checking_state] = temp
+        # checked_states = dfa.finals()
+        # equivalent_states = set()
+        print(distinct_states)
+        # return equivalent_states
+
     def minify(self):
-        self.__remove_unreachable_states()
+        """
+        Primeiramente remove os estados inacessíveis
+
+        Returns:
+            DFA: Retorna uma cópia minimizada do automato 
+        """
+        new_dfa = copy.deepcopy(self)
+        new_dfa.__remove_unreachable_states()
+        eq = self.__equivalent_states(new_dfa)
+        return new_dfa
